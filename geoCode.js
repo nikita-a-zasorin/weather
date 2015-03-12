@@ -1,18 +1,56 @@
 'use strict';
 
-angular.module('weatherApp', []);
+angular.module('weatherApp', ['ui.router']);
+
+angular.module('weatherApp')
+    .config(['$stateProvider', '$urlRouterProvider',
+        function ($stateProvider, $urlRouterProvider) {
+            $urlRouterProvider.otherwise('/');
+            $stateProvider
+                .state('home', {
+                    url: '/',
+                    templateUrl: 'home.html',
+                    controller: 'searchForm as main'
+                })
+                .state('location', {
+                    url: '/location/:coords',
+                    templateUrl: 'location.html',
+                    controller: 'locationPageController as loc'
+                });
+        }
+    ]);
 
 /**
  * This service stores the data relating to the weather, so it can be shared between googlePlacesController and searchForm
  */
 angular.module('weatherApp').factory('weather', ['$http',
     function ($http) {
-        var weather = '';
-        var place = {};
+
+        var weather = {};
+        var location = {
+            coords: '',
+            name: ''
+        };
 
         return {
             weather: weather,
-            place: place
+            location: location,
+            doSearch: function () {
+                if (!location.coords) {
+                    alert('Not found...');
+                } else {
+                    var url = "https://api.forecast.io/forecast/7ce90a9cbabf8e10728551e92b826887/" + location.coords + "?callback=JSON_CALLBACK";
+                    $http.jsonp(url).success(function (data) {
+                        console.log(data);
+                        angular.extend(weather, data.currently);
+                    });
+                }
+            },
+            setPlace: function (newPlace) {
+                console.log(newPlace);
+                location.coords = newPlace.geometry.location.lat() + ',' + newPlace.geometry.location.lng();
+                location.name = newPlace.formatted_address;
+            }
         };
     }
 ]);
@@ -21,26 +59,11 @@ angular.module('weatherApp').controller('searchForm', ['$http', 'weather',
     function ($http, weather) {
         var self = this;
 
-        self.place = weather.place;
         self.weather = weather.weather;
-        self.coordinates = '';
-        self.locName = weather.place.formatted_address;
+        self.location = weather.location;
 
         self.doSearch = function () {
-            if (!self.place) {
-                alert('Not found...');
-            } else {
-                var url = "https://api.forecast.io/forecast/7ce90a9cbabf8e10728551e92b826887/" + self.place.geometry.location.k + "," + self.place.geometry.location.D + "?callback=JSON_CALLBACK";
-
-                $http.jsonp(url).success(function (data) {
-                    console.log('Got some data!');
-                    console.log(data);
-                    self.title = "Weather for " + self.place.formatted_address + "...";
-                    self.weather = "Temperature is: " + data.currently.temperature + " degrees Fahrenheit.";
-                });
-
-                self.coordinates = "Weather for: " + self.location;
-            }
+            weather.doSearch();
         };
     }
 ]);
@@ -62,7 +85,25 @@ angular.module('weatherApp').directive('googlePlaces', function () {
 }).controller('googlePlacesController', ['weather',
     function (weather) {
         this.setPlace = function (place) {
-            angular.extend(weather.place, place);
+            console.log(place.geometry.location.lat());
+            weather.setPlace(place);
+            /**
+            weather.setLocation(place.formatted_address);
+            weather.setCoords(place.geometry.location.D, place.geometry.location.k);
+             */
+        };
+    }
+]);
+
+angular.module('weatherApp').controller('locationPageController', ['$stateParams', 'weather',
+    function ($stateParams, weather) {
+       var self = this;
+
+        self.coords = $stateParams.coords;
+        weather.location.coords = $stateParams.coords;
+
+        self.doSearch = function () {
+            weather.doSearch();
         };
     }
 ]);

@@ -4,16 +4,10 @@
     <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=true&libraries=places&language=en-US"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.0.3/angular-resource.min.js"></script>
+    <script src="router.js"></script>
     <script src="geoCode.js"></script>
 </head>
 <body>
-<div ng-controller="searchForm as main">
-    <google-places></google-places>
-    <button ng-click="main.doSearch()" class="btn btn-large btn-primary">Search</button>
-    <br>
-    <h3>{{main.title}}</h3>
-    <br>
-    <h4><i>{{main.weather}}</i></h4>
-</div>
+    <div ui-view></div>
 </body>
 </html>
