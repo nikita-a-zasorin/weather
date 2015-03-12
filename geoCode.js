@@ -3,23 +3,23 @@
             angular.module('weatherApp', ['weatherDirectives']);
 
 
-            function searchForm($scope, $http){
-                $scope.location = '';
+            function searchForm($http){
+                this.location = '';
 
-                $scope.doSearch = function(){
-                    if($scope.location === ''){
+                this.doSearch = function(){
+                    if(this.location === ''){
                         alert('Not found...');
                     } else {
-                        var url = "https://api.forecast.io/forecast/7ce90a9cbabf8e10728551e92b826887/"+$scope.location+"?callback=JSON_CALLBACK";
+                        var url = "https://api.forecast.io/forecast/7ce90a9cbabf8e10728551e92b826887/"+this.location+"?callback=JSON_CALLBACK";
 
 
                         $http.jsonp(url).success(function(data) {
-                        $scope.title = "Weather for "+ $scope.location + "...";
-                        $scope.weather = "Temperature is: " + data.currently.temperature + " degrees Fahrenheit.";
-                        $scope.location = '';
+                        this.title = "Weather for "+ this.location + "...";
+                        this.weather = "Temperature is: " + data.currently.temperature + " degrees Fahrenheit.";
+                        this.location = '';
                     });
 
-                        $scope.coordinates = "Weather for: " + $scope.location;
+                        this.coordinates = "Weather for: " + this.location;
                     }
                 };
             }
