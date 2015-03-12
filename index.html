@@ -7,13 +7,13 @@
     <script src="geoCode.js"></script>
 </head>
 <body>
-<div ng-app="weatherApp" ng-controller="searchForm">
+<div ng-app="weatherApp" ng-controller="searchForm as main">
     <google-places location=location></google-places>
-    <button ng-click="doSearch()" class="btn btn-large btn-primary">Search</button>
+    <button ng-click="main.doSearch()" class="btn btn-large btn-primary">Search</button>
     <br>
-    <h3>{{title}}</h3>
+    <h3>{{main.title}}</h3>
     <br>
-    <h4><i>{{weather}}</i></h4>
+    <h4><i>{{main.weather}}</i></h4>
 </div>
 </body>
 </html>
